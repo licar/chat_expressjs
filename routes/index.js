@@ -3,7 +3,7 @@ var router = express.Router();
 var contextService = require('request-context');
 var set = require("collections/set");
 var List = require("collections/list");
-var users = new Set();
+var users = new List();
 var messages = new List();
     
 /* GET home page. */
@@ -22,6 +22,7 @@ router.post('/login', function(req, res, next) {
         req.session.user = user;
         users.add(user);
     }
+    res.redirect('/chat');
     res.end();
 });
 
@@ -37,8 +38,9 @@ router.get('/chat', function(req, res, next) {
     if (!req.session.user){
         res.redirect('/')
     }else{
-        res.render('index', { title: 'Express' });
+        res.render('chat', { title: 'Express' });
     }
+    res.end();
 });
 
 router.post('/sendMessage', function(req, res, next) {
@@ -51,11 +53,28 @@ router.post('/sendMessage', function(req, res, next) {
 });
 
 router.post('/getMessages', function(req, res, next) {
-    res.send(JSON.stringify(messages));
+    res.send(prepareMessages());
 });
 
 router.post('/getUsers', function(req, res, next) {
-    res.send(JSON.stringify(users));
+    res.send(prepareUsers());
 });
+
+function prepareMessages() {
+    var result = '';
+    messages.toArray().forEach(function (item, i, arr){
+       result += '<dt>' + item.user + '</dt>';
+       result += '<dd>' + item.text + '</dd>';
+    });
+    return result;
+}
+
+function prepareUsers() {
+    var result = '';
+    users.toArray().forEach(function (item, i, arr){
+        if (item) result += "<h4>" + item + "</h4>"
+    });
+    return result;
+}
 
 module.exports = router;
