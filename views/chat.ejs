@@ -10,12 +10,14 @@
         function getUsers() {
             $.post( "/getUsers", function( data ) {
                 $( "#users" ).html( data );
+                setTimeout(getUsers,5000);
             });
         }
 
         function getMessages() {
             $.post( "/getMessages", function( data ) {
                 $( "#messages" ).html( data );
+                setTimeout(getMessages,5000);
             });
         }
 
