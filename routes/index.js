@@ -44,7 +44,7 @@ router.get('/chat', function(req, res, next) {
     res.end();
 });
 
-router.post('/sendMessage', function(req, res, next) {
+router.post('/send', function(req, res, next) {
     var message  =  {
         text : req.param('text'),
         user : req.session.user
@@ -59,6 +59,7 @@ router.post('/getMessages', function(req, res, next) {
 
 router.post('/getUsers', function(req, res, next) {
     res.send(prepareUsers());
+    res.end();
 });
 
 function prepareMessages() {

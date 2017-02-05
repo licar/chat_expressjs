@@ -14,19 +14,34 @@
         }
 
         function getMessages() {
-            $.post( "/getUsers", function( data ) {
+            $.post( "/getMessages", function( data ) {
                 $( "#messages" ).html( data );
             });
         }
 
-        $( document ).ready(function() {
+        function update() {
             getUsers();
             getMessages();
+        }
+
+        function getText() {
+            return $('#text').val();
+        }
+
+        $( document ).ready(function() {
+            update();
         });
 
         function logout () {
             $.get( "/logout", function( ) {});
             location.reload();
+        }
+
+        function sendMessage() {
+            var text = getText();
+            $.post( "/send", {text : text}, function( ) {
+                getMessages();
+            });
         }
     </script>
 
@@ -34,16 +49,20 @@
 <body>
     <div class="row">
         <div class="col-sm-3"></div>
-        <div class="col-sm-5" id="chat" style="background-color: azure">
-            <form method="post" action="/sendMessage">
-                <input type="password" class="form-control" id="pwd">
-                <button type="submit" class="btn btn-default">Send</button>
-            </form>
-        </div>
+        <div class="col-sm-5" id="messages" style="background-color: azure"></div>
         <div class="col-sm-1" id="users" style="background-color: beige"></div>
         <div class="col-sm-3">
             <button type="button" id="logout" onclick="logout()" class="btn btn-primary active">Logout</button>
         </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-5" style="background-color: dodgerblue">
+            <input type="text" class="form-control" id='text'>
+            <button type="submit" onclick="sendMessage()" class="btn btn-default">Send</button>
+        </div>
+        <div class="col-sm-1" style="background-color: beige"></div>
+        <div class="col-sm-3"></div>
     </div>
 </body>
 </html>
