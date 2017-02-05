@@ -9,15 +9,19 @@
     "body-parser": "~1.15.2",
     "bootstrap": "^3.3.7",
     "client-sessions": "^0.7.0",
+    "collections": "^5.0.6",
     "connect": "^3.5.0",
     "cookie-parser": "~1.4.3",
     "cookie-session": "^2.0.0-alpha.2",
     "debug": "~2.2.0",
     "ejs": "~2.5.2",
     "express": "~4.14.0",
+    "express-context": "^0.7.1",
     "express-session": "^1.15.0",
+    "hashmap": "^2.0.6",
     "jquery": "^3.1.1",
     "morgan": "~1.7.0",
+    "request-context": "^2.0.0",
     "serve-favicon": "~2.3.0"
   }
 }
