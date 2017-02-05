@@ -13,12 +13,13 @@ router.get('/', function(req, res, next) {
     }else{
         res.render('index', { title: 'Express' });
     }
+    res.end();
 });
 
 router.post('/login', function(req, res, next) {
     var user = req.param('user');
     var password = req.param('password');
-    if (password == '1'){
+    if (password == '1' && !users.has(user)){
         req.session.user = user;
         users.add(user);
     }
@@ -30,8 +31,8 @@ router.get('/logout', function(req, res, next) {
     var user = req.session.user;
     users.delete(user);
     req.session.destroy();
-    req.end();
-    req.redirect('/');
+    res.redirect('/');
+    res.end();
 });
 
 router.get('/chat', function(req, res, next) {
@@ -49,7 +50,7 @@ router.post('/sendMessage', function(req, res, next) {
         user : req.session.user
     };
     messages.push(message);
-
+    res.end();
 });
 
 router.post('/getMessages', function(req, res, next) {

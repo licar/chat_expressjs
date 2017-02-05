@@ -7,20 +7,43 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 
     <script>
-        $( document ).ready(function() {
+        function getUsers() {
             $.post( "/getUsers", function( data ) {
                 $( "#users" ).html( data );
             });
+        }
+
+        function getMessages() {
+            $.post( "/getUsers", function( data ) {
+                $( "#messages" ).html( data );
+            });
+        }
+
+        $( document ).ready(function() {
+            getUsers();
+            getMessages();
         });
+
+        function logout () {
+            $.get( "/logout", function( ) {});
+            location.reload();
+        }
     </script>
 
 </head>
 <body>
     <div class="row">
         <div class="col-sm-3"></div>
-        <div class="col-sm-5" id="chat" style="background-color: azure"></div>
+        <div class="col-sm-5" id="chat" style="background-color: azure">
+            <form method="post" action="/sendMessage">
+                <input type="password" class="form-control" id="pwd">
+                <button type="submit" class="btn btn-default">Send</button>
+            </form>
+        </div>
         <div class="col-sm-1" id="users" style="background-color: beige"></div>
-        <div class="col-sm-3"></div>
+        <div class="col-sm-3">
+            <button type="button" id="logout" onclick="logout()" class="btn btn-primary active">Logout</button>
+        </div>
     </div>
 </body>
 </html>
