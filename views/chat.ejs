@@ -17,7 +17,7 @@
         function getMessages() {
             $.post( "/getMessages", function( data ) {
                 $( "#messages" ).html( data );
-                setTimeout(getMessages,5000);
+                setTimeout(getMessages,1000);
             });
         }
 

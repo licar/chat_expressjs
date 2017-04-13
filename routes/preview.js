@@ -3,6 +3,7 @@ var router = express.Router();
 var contextService = require('request-context');
 var set = require("collections/set");
 var List = require("collections/list");
+var users = new List();
 var messages = new List();
 var sequelizeSingleton = require("../data_access/SequelizeSingleton")
 var sequelize = new sequelizeSingleton()
@@ -22,33 +23,31 @@ router.get('/', function(req, res, next) {
     res.end();
 });
 
-router.get('/createAccount', function(req, res, next) {
-    res.render('register');
-});
-
 router.post('/register', function(req, res, next) {
-    var username = req.param('username');
+    var user = req.param('email');
     var password = req.param('password');
-    userRepository.create(username, password, function (responce){
-        var lol = responce
-        req.session.username = username;
-        res.redirect('/chat');
-    })
+    if (password == 'password' && !users.has(user)){
+        req.session.user = user;
+        users.add(user);
+    }
+    res.redirect('/chat');
     res.end();
 });
 
 router.post('/login', function(req, res, next) {
-    var username = req.param('username');
+    var user = req.param('email');
     var password = req.param('password');
-    if (userRepository.get(username, password) != null){
-        req.session.username = username;
-        res.redirect('/chat');
+    if (password == 'password' && !users.has(user)){
+        req.session.user = user;
+        users.add(user);
     }
+    res.redirect('/chat');
     res.end();
 });
 
 router.get('/logout', function(req, res, next) {
-    var user = req.session.username;
+    var user = req.session.user;
+    users.delete(user);
     req.session.destroy();
     res.redirect('/');
     res.end();
@@ -79,6 +78,10 @@ router.post('/getMessages', function(req, res, next) {
 router.post('/getUsers', function(req, res, next) {
     res.send(prepareUsers());
     res.end();
+});
+
+router.get('/register', function(req, res, next) {
+    res.render('register', { title: 'Express' });
 });
 
 function prepareMessages() {
