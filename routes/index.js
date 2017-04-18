@@ -13,6 +13,7 @@ var roomRepository = require("../data_access/repositories/RoomRepository")
 var messageRepository = require("../data_access/repositories/MessageRepository")
 
 /* GET home page. */
+//-----------------------------------
 router.get('/', function(req, res, next) {
     if (req.session.user){
         res.redirect('/chat')
@@ -29,73 +30,158 @@ router.get('/createAccount', function(req, res, next) {
 router.post('/register', function(req, res, next) {
     var username = req.param('username');
     var password = req.param('password');
-    userRepository.create(username, password, function (responce){
-        var lol = responce
-        req.session.username = username;
+    // if (userRepository.login(username, password) != null){
+    //     req.session.username = username;
+    //     res.redirect('/chat');
+    // }
+    // res.end();
+    userRepository.register(username, password, function (user) {
+        req.session.user = user;
         res.redirect('/chat');
+        res.end()
     })
-    res.end();
 });
 
 router.post('/login', function(req, res, next) {
     var username = req.param('username');
     var password = req.param('password');
-    if (userRepository.get(username, password) != null){
-        req.session.username = username;
+    // if (userRepository.login(username, password) != null){
+    //     req.session.username = username;
+    //     res.redirect('/chat');
+    // }
+    // res.end();
+    userRepository.login(username, password, function (user) {
+        req.session.user = user;
         res.redirect('/chat');
-    }
-    res.end();
+        res.end()
+    })
 });
 
 router.get('/logout', function(req, res, next) {
-    var user = req.session.username;
-    req.session.destroy();
-    res.redirect('/');
-    res.end();
+    var user = req.session.user
+    if (user) {
+        var name = req.param('name');
+        roomRepository.out(name, user, function () {
+            req.session.destroy();
+            res.redirect('/');
+            res.end();
+        })
+
+    }
 });
 
+router.get('/remove', function(req, res, next) {
+    var user = req.session.user
+    if (!user){
+        res.redirect('/')
+    }
+    var name = req.param('name');
+    roomRepository.delete(user, name, function () {
+        res.redirect('/chat')
+        res.end();
+    })
+});
+
+//------------------------------
 router.get('/chat', function(req, res, next) {
     if (!req.session.user){
         res.redirect('/')
     }else{
-        res.render('chat', { title: 'Express' });
+        res.render('chat-list');
     }
     res.end();
 });
 
+router.post('/chat/create', function(req, res, next) {
+    var user = req.session.user
+    if (!user){
+        res.redirect('/')
+    }
+    var name = req.param('name');
+    roomRepository.create(user, name, function () {
+        res.redirect('/chat/enter?name=' + name)
+        res.end();
+    })
+});
+
+router.get('/chat/enter', function(req, res, next) {
+    var user = req.session.user
+    if (!user){
+        res.redirect('/')
+    }
+    var name = req.param('name');
+    roomRepository.get(user, name, function (name) {
+        res.redirect('/showchat?name=' + name)
+        res.end();
+    })
+});
+
+router.get('/showchat', function(req, res, next) {
+    var user = req.session.user
+    if (!user) {
+        res.redirect('/')
+    } else {
+        var name = req.param('name');
+        res.render('chat', {
+            users : 'getUsers?name=' + name,
+            messages : 'getMessages?name=' + name,
+            send : 'send?name=' + name,
+            logout : 'logout?name=' + name,
+            remove : 'remove?name=' + name
+        });
+    }
+    res.end();
+})
+//-------------------------
 router.post('/send', function(req, res, next) {
-    var message  =  {
-        text : req.param('text'),
-        user : req.session.user
-    };
-    messages.push(message);
+    var user = req.session.user
+    if (!user){
+        res.redirect('/')
+    }
+    var text = req.param('text');
+    var name = req.param('name');
+    roomRepository.addMessage(name, text, user, function (result) {
+        res.send(result)
+        res.end()
+    });
     res.end();
 });
 
 router.post('/getMessages', function(req, res, next) {
-    res.send(prepareMessages());
+    var user = req.session.user
+    if (!user){
+        res.redirect('/')
+    }
+    var name = req.param('name');
+    roomRepository.getMessages(name, user, function (result) {
+        res.send(result)
+        res.end()
+    });
 });
 
 router.post('/getUsers', function(req, res, next) {
-    res.send(prepareUsers());
-    res.end();
+    var user = req.session.user
+    if (!user){
+        res.redirect('/')
+    }
+    var name = req.param('name');
+    roomRepository.getUsers(name, user, function (result) {
+        res.write(result);
+        res.end();
+    });
 });
 
-function prepareMessages() {
-    var result = '';
-    messages.toArray().forEach(function (item, i, arr){
-       result += '<dt>' + item.user + '</dt>';
-       result += '<dd>' + item.text + '</dd>';
-    });
-    return result;
-}
+router.get('/ban', function(req, res, next) {
+    var user = req.session.user
+    if (!user){
+        res.redirect('/')
+    }
+    var name = req.param('name');
+    var username = req.param('username')
+    roomRepository.ban(user, username, name, function () {
+        res.end();
+    })
+});
 
-function prepareUsers() {
-    var result = '';
-    users.toArray().forEach(function (item, i, arr){
-        if (item) result += "<h4>" + item + "</h4>"
-    });
-    return result;
-}
-
+//-----------------------------------------
 module.exports = router;

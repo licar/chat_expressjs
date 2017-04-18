@@ -8,7 +8,7 @@ var context = require('request-context');
 var bodyParser = require('body-parser');
 var contextService = require('request-context');
 var index = require('./routes/index');
-
+var chat = require('./routes/chat');
 var app = express();
 
 // view engine setup

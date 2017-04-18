@@ -8,16 +8,18 @@
 
     <script>
         function getUsers() {
-            $.post( "/getUsers", function( data ) {
+            $.post("<%= users %>", function( data ) {
+                debugger
                 $( "#users" ).html( data );
-                setTimeout(getUsers,5000);
+                setTimeout(getUsers, 5000);
             });
         }
 
         function getMessages() {
-            $.post( "/getMessages", function( data ) {
+            $.post( "<%= messages %>", function( data ) {
+                debugger
                 $( "#messages" ).html( data );
-                setTimeout(getMessages,1000);
+                setTimeout(getMessages, 1000);
             });
         }
 
@@ -35,13 +37,18 @@
         });
 
         function logout () {
-            $.get( "/logout", function( ) {});
+            $.get( "<%= logout %>", function( ) {});
+            location.reload();
+        }
+
+        function remove() {
+            $.get( "<%= remove %>", function( ) {});
             location.reload();
         }
 
         function sendMessage() {
             var text = getText();
-            $.post( "/send", {text : text}, function( ) {
+            $.post( "<%= send %>", {text : text}, function( ) {
                 getMessages();
             });
         }
@@ -55,6 +62,7 @@
         <div class="col-sm-1" id="users" style="background-color: beige"></div>
         <div class="col-sm-3">
             <button type="button" id="logout" onclick="logout()" class="btn btn-primary active">Logout</button>
+            <button type="button" id="delete-room" onclick="remove()" class="btn btn-primary active">Remove</button>
         </div>
     </div>
     <div class="row">
